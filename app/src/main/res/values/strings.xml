@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Cinema Tickets Booking</string>
+    <string name="app_description">Thế giới điện ảnh giờ đây gói gọn ngay trong chiếc điện thoại của bạn. Từ những bom tấn Hollywood mới nhất đến các bộ phim độc lập đầy nghệ thuật, chúng tôi mang đến cho bạn giải pháp đặt vé nhanh chóng, tiện lợi và thông minh nhất.</string>
+    <string name="btnStarted">Get Started</string>
+    <string name="hint_Search">Search</string>
+    <string name="Top_Movies">Top Movies</string>
+    <string name="Upcoming_Movies">Upcoming Movies</string>
+    <string name="See_All">See all</string>
+    <string name="explorer">Explorer</string>
+    <string name="favorites">Favorites</string>
+    <string name="cart">Cart</string>
+    <string name="profile">Profile</string>
+    <string name="Buy_Ticket">Buy Ticket</string>
+    <string name="Selected_seat">Selected Seats</string>
+    <string name="Available_seat">Available</string>
+    <string name="Selected">Selected</string>
+    <string name="Unavailable_seat">Unavailable</string>
+    <string name="Download_Ticket">Download Ticket</string>
+
+</resources>

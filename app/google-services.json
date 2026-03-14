@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "128536044997",
+    "firebase_url": "https://ordertickets-9c094-default-rtdb.firebaseio.com",
+    "project_id": "ordertickets-9c094",
+    "storage_bucket": "ordertickets-9c094.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:128536044997:android:e20643108b2defe22597ac",
+        "android_client_info": {
+          "package_name": "com.example.ordertickets"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnfAvf95eNz7YzwwYI4sdOK2aVHbe_-DE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
