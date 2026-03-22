@@ -9,6 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.ordertickets.R
+import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
 
@@ -43,12 +44,18 @@ class LoginActivity : AppCompatActivity() {
 
         // 2. Xử lý sự kiện khi nhấn nút chính
         btnSubmit.setOnClickListener {
-            val email = edtEmail.text.toString()
-            val pass = edtPassword.text.toString()
-            val confirmPass = edtConfirmPassword.text.toString()
+            val email = edtEmail.text.toString().trim()
+            val pass = edtPassword.text.toString().trim()
+            val confirmPass = edtConfirmPassword.text.toString().trim() // Thêm trim cho cả confirm password
 
             if (email.isEmpty() || pass.isEmpty()) {
                 Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // KIỂM TRA ĐỊNH DẠNG EMAIL TẠI ĐÂY, thiếu  sẽ hiện ra thông báo thiểu gì
+            if (!isValidEmail(email)) {
+                Toast.makeText(this, "Email không đúng định dạng (ví dụ: abc@gmail.com)", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -65,22 +72,31 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun performLogin(email: String, pass: String) {
-        // Giả sử đăng nhập thành công
-        Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show()
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
-        finish()
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, pass)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Sai email hoặc mật khẩu!", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun isValidEmail(email: String): Boolean {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
     private fun performRegister(email: String, pass: String) {
-        // Logic đăng ký tài khoản (ví dụ lưu vào Firebase hoặc Database)
-        // ...
-        
-        Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show()
-        
-        // Điều hướng thẳng đến trang Profile sau khi đăng ký thành công
-        val intent = Intent(this, ProfileActivity::class.java)
-        startActivity(intent)
-        finish()
+        FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, pass)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Tạo tài khoản thành công!", Toast.LENGTH_SHORT).show()
+                // Sau khi tạo xong, chuyển thẳng đến ProfileActivity như bạn mong muốn
+                startActivity(Intent(this, ProfileActivity::class.java))
+                finish()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Lỗi: ${it.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 }

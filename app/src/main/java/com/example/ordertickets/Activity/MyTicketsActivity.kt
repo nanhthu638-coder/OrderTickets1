@@ -1,31 +1,62 @@
 package com.example.ordertickets.Activity
 
+import android.os.Bundle
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.ordertickets.Adapter.TicketAdapter
 import com.example.ordertickets.Models.Ticket
+import com.example.ordertickets.databinding.ActivityMyTicketsBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import kotlin.collections.getValue
 
-class MyTicketsActivity {
-    // Trong MyTicketsActivity.kt
-    private fun loadTickets() {
+class MyTicketsActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMyTicketsBinding
+    private lateinit var ticketAdapter: TicketAdapter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMyTicketsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        binding.imgBack.setOnClickListener { finish() }
+
+        setupRecyclerView()
+        loadTicketsFromFirebase()
+    }
+
+    private fun setupRecyclerView() {
+        binding.rvMyTickets.layoutManager = LinearLayoutManager(this)
+    }
+
+    private fun loadTicketsFromFirebase() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val ref =
-            FirebaseDatabase.getInstance().getReference("Tickets")
-        // Lọc vé theo ID người dùng hiện tại
-        ref.orderByChild("userId").equalTo(userId).addValueEventListener(object :
-            ValueEventListener {
+        binding.progressBar.visibility = View.VISIBLE
+
+        val ref = FirebaseDatabase.getInstance().getReference("Tickets")
+        ref.orderByChild("userId").equalTo(userId).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val ticketList = mutableListOf<Ticket>()
+                binding.progressBar.visibility = View.GONE
+                val list = mutableListOf<Ticket>()
                 for (ds in snapshot.children) {
                     val ticket = ds.getValue(Ticket::class.java)
-                    if (ticket != null) ticketList.add(ticket)
+                    if (ticket != null) list.add(ticket)
                 }
-                // Gán ticketList vào TicketAdapter và hiển thị lên RecyclerView
+
+                if (list.isEmpty()) {
+                    binding.tvEmpty.visibility = View.VISIBLE
+                } else {
+                    binding.tvEmpty.visibility = View.GONE
+                    ticketAdapter = TicketAdapter(list)
+                    binding.rvMyTickets.adapter = ticketAdapter
+                }
             }
-            override fun onCancelled(error: DatabaseError) {}
+            override fun onCancelled(error: DatabaseError) {
+                binding.progressBar.visibility = View.GONE
+            }
         })
     }
 }

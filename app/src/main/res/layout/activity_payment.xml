@@ -164,6 +164,18 @@
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold" />
+            <!-- Chèn vào bên dưới nút btnConfirmPayment trong activity_payment.xml -->
+            <TextView
+                android:id="@+id/btnCancelPayment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:padding="12dp"
+                android:text="Hủy thanh toán"
+                android:textColor="@color/grey"
+                android:textSize="16sp"
+                android:background="?attr/selectableItemBackground" />
 
         </LinearLayout>
     </ScrollView>

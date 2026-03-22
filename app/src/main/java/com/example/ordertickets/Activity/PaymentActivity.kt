@@ -50,6 +50,21 @@ class PaymentActivity : AppCompatActivity() {
                 saveTicketToFirebase()
             }
         }
+        binding.btnCancelPayment.setOnClickListener {
+           showCancelDialog()
+        }
+    }
+    private fun showCancelDialog() {
+        val builder = android.app.AlertDialog.Builder(this)
+        builder.setTitle("Xác nhận hủy")
+        builder.setMessage("Bạn có chắc chắn muốn hủy thanh toán và quay lại không?")
+        builder.setPositiveButton("Đồng ý") { _, _ ->
+            finish() // Đóng trang thanh toán
+        }
+        builder.setNegativeButton("Tiếp tục thanh toán") { dialog, _ ->
+            dialog.dismiss()
+        }
+        builder.show()
     }
     private fun saveTicketToFirebase() {
         val currentUser = FirebaseAuth.getInstance().currentUser
