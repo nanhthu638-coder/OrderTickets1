@@ -57,21 +57,33 @@ class MainActivity : AppCompatActivity() {
         initTopMoving()
         initUpcomingMovies()
         setupSearch()
+        setupBottomNavigation()
+    }
 
-        val btnProfile = findViewById<Button>(R.id.btnProfile)
-        btnProfile.setOnClickListener {
-            val currentUser = FirebaseAuth.getInstance().currentUser
-            if (currentUser == null) {
+    private fun setupBottomNavigation() {
+        // Mặc định chọn icon đầu tiên (Explorer)
+        binding.chipNavigationBar.setItemSelected(R.id.explorer, true)
 
-                val intent = Intent(this, LoginActivity::class.java)
-                startActivity(intent)
-            } else{
-                val intent = Intent(this, ProfileActivity::class.java)
-                startActivity(intent)
+        binding.chipNavigationBar.setOnItemSelectedListener { id ->
+            when (id) {
+                R.id.profile -> {
+                    // Logic kiểm tra đăng nhập giống hệt nút Profile cũ của bạn
+                    val currentUser = FirebaseAuth.getInstance().currentUser
+                    if (currentUser == null) {
+                        startActivity(Intent(this, LoginActivity::class.java))
+                    } else {
+                        startActivity(Intent(this, ProfileActivity::class.java))
+                    }
+                }
+                R.id.explorer -> {
+                    // Có thể thêm logic quay về đầu trang hoặc load lại dữ liệu
+                }
+                // Bạn có thể thêm xử lý cho favorites hoặc cart tại đây
             }
-
-
         }
+
+
+
     }
     private fun setupSearch() {
 

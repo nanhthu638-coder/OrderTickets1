@@ -20,7 +20,7 @@ class ProfileActivity : AppCompatActivity() {
         val rvProfile = findViewById<RecyclerView>(R.id.rvProfile)
 
         // 1. Tạo danh sách các mục hiển thị
-        val menuItems = listOf("Thông tin tài khoản", "Lịch sử đặt vé", "Cài đặt", "Đăng xuất")
+        val menuItems = listOf("Thông tin tài khoản", "Lịch sử đặt vé", "Cài đặt", "Đăng xuất", "Vé của tôi")
 
         // 2. Thiết lập Adapter
         val adapter = ProfileAdapter(menuItems) { selectedItem ->

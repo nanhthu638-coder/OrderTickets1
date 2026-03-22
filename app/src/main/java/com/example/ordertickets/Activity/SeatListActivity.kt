@@ -19,12 +19,16 @@ import com.example.ordertickets.databinding.ActivitySeatListBinding
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-
+import android.content.Intent
+import android.widget.Toast
 class SeatListActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySeatListBinding
     private lateinit var film: Film
     private var price: Double = 0.0
     private var number: Int=0
+    private var selectedSeatNames=""
+    private var selectedDate=""
+    private var selectedTime=""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,16 +60,35 @@ class SeatListActivity : AppCompatActivity() {
             else Seat.SeatStatus.AVAILABLE
             seatList.add(Seat(SeatStatus,SeatName))
         }
+
         val SeatAdapter= SeatListAdapter(seatList,this,object :SeatListAdapter.SelectedSeat{
             override fun Return(selectedName: String, num: Int) {
                 binding.tvSeatSelected.text="$num Seat Selected"
                 var df= DecimalFormat("#.##")
                 price=df.format(num*film.Price).toDouble()
                 number = num
+                selectedSeatNames=selectedName
+
                 binding.tvPriceTxt.text="$$price"
             }
 
         })
+        binding.btnDownloadTicket.setOnClickListener {
+            if (number > 0) {
+                val intent = Intent(this, PaymentActivity::class.java)
+                intent.putExtra("filmTitle", film.Title)
+                intent.putExtra("selectedSeats", selectedSeatNames)
+                intent.putExtra("totalPrice", price)
+                // Lưu ý: Bạn cần logic để lấy ngày/giờ đang chọn từ Adapter
+                // Tạm thời truyền mẫu:
+                intent.putExtra("date", "20/10/2023")
+                intent.putExtra("time", "10:00 AM")
+
+                startActivity(intent)
+            } else {
+                Toast.makeText(this, "Vui lòng chọn ghế trước khi thanh toán", Toast.LENGTH_SHORT).show()
+            }
+        }
         binding.rvSeats.adapter=SeatAdapter
         binding.rvSeats.isNestedScrollingEnabled=false
 
