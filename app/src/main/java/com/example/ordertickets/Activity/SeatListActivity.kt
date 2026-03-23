@@ -25,6 +25,8 @@ class SeatListActivity : AppCompatActivity() {
     private var price: Double = 0.0
     private var number: Int = 0
     private var selectedSeatNames = ""
+    private var selectedDate: String = ""
+    private var selectedTime: String = ""
     private val seatTimers = HashMap<String, CountDownTimer>()
     private val HOLD_TIME = 40 * 1000L // Đã chỉnh xuống 40 giây
 
@@ -88,11 +90,15 @@ class SeatListActivity : AppCompatActivity() {
 
         binding.rvTime.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        binding.rvTime.adapter = TimeAdapter(generateTimeSlots())
+        binding.rvTime.adapter = TimeAdapter(generateTimeSlots(), onTimeClick = { time ->
+            selectedTime = time
+        })
 
         binding.rvDate.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        binding.rvDate.adapter = DateAdapter(generateDate())
+        binding.rvDate.adapter = DateAdapter(generateDate(), onDateClick = { date ->
+            selectedDate = date
+        })
     }
 
     private fun startTimer(seat: Seat) {
@@ -113,6 +119,7 @@ class SeatListActivity : AppCompatActivity() {
                         .filter { it != seat.name && it.isNotEmpty() }
                         .toMutableList()
                     selectedSeatNames = list.joinToString(", ")
+
                     number = list.size
                     binding.tvSeatSelected.text = "$number Seat Selected"
                     price = number * film.Price
@@ -143,8 +150,8 @@ class SeatListActivity : AppCompatActivity() {
                 intent.putExtra("filmTitle", film.Title)
                 intent.putExtra("selectedSeats", selectedSeatNames)
                 intent.putExtra("totalPrice", price)
-                intent.putExtra("date", "20/10/2023")
-                intent.putExtra("time", "10:00 AM")
+                intent.putExtra("date", selectedDate)
+                intent.putExtra("time", selectedTime)
                 startActivity(intent)
             } else {
                 Toast.makeText(this, "Vui lòng chọn ghế", Toast.LENGTH_SHORT).show()
