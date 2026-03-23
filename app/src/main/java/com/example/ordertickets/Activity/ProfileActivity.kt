@@ -23,7 +23,7 @@ class ProfileActivity : AppCompatActivity() {
         val adapter = ProfileAdapter(menuItems) { selectedItem ->
             when (selectedItem) {
                 "Đăng xuất" -> {
-                    val intent = Intent(this, LoginActivity::class.java)
+                    val intent = Intent(this, MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
                 }

@@ -1,6 +1,7 @@
 package com.example.ordertickets.Activity
 
 import android.content.Intent
+import android.icu.text.DecimalFormat
 import android.os.Bundle
 import android.view.WindowManager
 import android.widget.Toast
@@ -33,10 +34,12 @@ class PaymentActivity : AppCompatActivity() {
         val totalPrice = intent.getDoubleExtra("totalPrice", 0.0)
         val date = intent.getStringExtra("date") ?: "N/A"
         val time = intent.getStringExtra("time") ?: "N/A"
+        val df = DecimalFormat("#,###")
 
+        binding.tvTotalPrice.text = df.format(totalPrice) + " VND"
         binding.tvFilmTitle.text = filmTitle
         binding.tvSummary.text = "Ghế: $selectedSeats\nNgày: $date\nGiờ: $time"
-        binding.tvTotalPrice.text = "$$totalPrice"
+
     }
 
     private fun setVariables() {

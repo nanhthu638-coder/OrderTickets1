@@ -66,11 +66,12 @@ class SeatListActivity : AppCompatActivity() {
         val seatAdapter = SeatListAdapter(seatList, this, object : SeatListAdapter.SelectedSeat {
             override fun Return(selectedName: String, num: Int) {
                 binding.tvSeatSelected.text = "$num Seat Selected"
-                val df = DecimalFormat("#.##")
-                price = df.format(num * film.Price).toDouble()
+                price = num * film.Price   // giữ dạng số
                 number = num
                 selectedSeatNames = selectedName
-                binding.tvPriceTxt.text = "$$price"
+
+                val df = DecimalFormat("#,###")
+                binding.tvPriceTxt.text = df.format(price) + " VND"
             }
 
             override fun onSeatClick(seat: Seat) {
@@ -114,9 +115,8 @@ class SeatListActivity : AppCompatActivity() {
                     selectedSeatNames = list.joinToString(", ")
                     number = list.size
                     binding.tvSeatSelected.text = "$number Seat Selected"
-                    val df = DecimalFormat("#.##")
-                    price = df.format(number * film.Price).toDouble()
-                    binding.tvPriceTxt.text = "$$price"
+                    price = number * film.Price
+                    binding.tvPriceTxt.text = "$price VND"
 
                     binding.rvSeats.adapter?.notifyDataSetChanged()
                     Toast.makeText(this@SeatListActivity, "Hết thời gian giữ ghế ${seat.name}", Toast.LENGTH_SHORT).show()
