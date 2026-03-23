@@ -25,34 +25,34 @@ import android.text.TextWatcher
 import android.text.Editable
 import com.example.ordertickets.R
 import android.content.Intent
-import android.widget.Button
 import com.google.firebase.auth.FirebaseAuth
 
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding //ViewBinding → truy cập View không cần findViewById
-    private lateinit var dataBase: FirebaseDatabase //Kết nối Firebase Realtime Database
-    private val sliderHandler= Handler(Looper.getMainLooper()) //Dùng để hẹn giờ (timer) cho slider
-    private val sliderRunnable = Runnable {binding.viewPager2.currentItem =
-        (binding.viewPager2.currentItem + 1) % (binding.viewPager2.adapter?.itemCount ?: 1) } //Mỗi lần chạy → slider sang trang tiếp theo
-    private lateinit var topMoviesList: ArrayList<Film>
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var dataBase: FirebaseDatabase
+    private val sliderHandler = Handler(Looper.getMainLooper())
+    private val sliderRunnable = Runnable {
+        binding.viewPager2.currentItem =
+            (binding.viewPager2.currentItem + 1) % (binding.viewPager2.adapter?.itemCount ?: 1)
+    }
+    private var topMoviesList = ArrayList<Film>() // Khởi tạo danh sách trống
     private lateinit var topMoviesAdapter: FilmListAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //Gắn layout bằng ViewBinding
-        binding= ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        //Kết nối Firebase
-        dataBase= FirebaseDatabase.getInstance()
-        //Banner tràn full màn hình
+        
+        dataBase = FirebaseDatabase.getInstance()
+        
         window.setFlags(
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
         )
-        //Gọi hàm lấy dữ liệu banner
+        
         initBanner()
         initTopMoving()
         initUpcomingMovies()
@@ -61,13 +61,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNavigation() {
-        // Mặc định chọn icon đầu tiên (Explorer)
         binding.chipNavigationBar.setItemSelected(R.id.explorer, true)
 
         binding.chipNavigationBar.setOnItemSelectedListener { id ->
             when (id) {
                 R.id.profile -> {
-                    // Logic kiểm tra đăng nhập giống hệt nút Profile cũ của bạn
                     val currentUser = FirebaseAuth.getInstance().currentUser
                     if (currentUser == null) {
                         startActivity(Intent(this, LoginActivity::class.java))
@@ -76,28 +74,23 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 R.id.explorer -> {
-                    // Có thể thêm logic quay về đầu trang hoặc load lại dữ liệu
                 }
-                // Bạn có thể thêm xử lý cho favorites hoặc cart tại đây
             }
         }
-
-
-
     }
+
     private fun setupSearch() {
-
         binding.editTextText.addTextChangedListener(object : TextWatcher {
-
             override fun afterTextChanged(s: Editable?) {
-
                 val keyword = s?.toString() ?: ""
 
-                val filteredList = topMoviesList.filter { film ->
-                    film.Title?.contains(keyword, ignoreCase = true) == true
+                // Kiểm tra nếu danh sách hoặc adapter đã được khởi tạo chưa
+                if (::topMoviesAdapter.isInitialized && topMoviesList.isNotEmpty()) {
+                    val filteredList = topMoviesList.filter { film ->
+                        film.Title?.contains(keyword, ignoreCase = true) == true
+                    }
+                    topMoviesAdapter.updateList(filteredList)
                 }
-
-                topMoviesAdapter.updateList(filteredList)
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -105,135 +98,117 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-
-    //initBanner() – LẤY DỮ LIỆU FIREBASE
     private fun initBanner() {
-        //Trỏ tới node
-        val myRef: DatabaseReference =dataBase.getReference("Banners")
-        binding.pgBSlider.visibility= View.VISIBLE //Hiện ProgressBar khi đang load
-        //Đọc dữ liệu 1 lần duy nhất (không realtime)
+        val myRef: DatabaseReference = dataBase.getReference("Banners")
+        binding.pgBSlider.visibility = View.VISIBLE
         myRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            //Firebase trả về toàn bộ node Banners
             override fun onDataChange(snapshot: DataSnapshot) {
-                val lists=mutableListOf<Slideritems>() //Tạo danh sách slider
-                for(childSnapshot in snapshot.children){
-                    val list=childSnapshot.getValue(Slideritems::class.java) //Map dữ liệu Firebase → object Slideritems
-                    if(list!=null){
+                val lists = mutableListOf<Slideritems>()
+                for (childSnapshot in snapshot.children) {
+                    val list = childSnapshot.getValue(Slideritems::class.java)
+                    if (list != null) {
                         lists.add(list)
-
                     }
                 }
-                //Ẩn loading → hiển thị slider
-                binding.pgBSlider.visibility= View.GONE
+                binding.pgBSlider.visibility = View.GONE
                 banners(lists)
             }
 
-
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
             }
-
         })
-
     }
 
     private fun initTopMoving() {
-        val myRef: DatabaseReference =dataBase.getReference("Items")
-        binding.pgBTopMovies.visibility= View.VISIBLE //Hiện ProgressBar khi đang load
-        val items= ArrayList<Film>()
+        val myRef: DatabaseReference = dataBase.getReference("Items")
+        binding.pgBTopMovies.visibility = View.VISIBLE
         myRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                if(snapshot.exists()){
-                    for(issue in snapshot.children){
-                        items.add(issue.getValue(Film::class.java)!!)
+                if (snapshot.exists()) {
+                    topMoviesList.clear() // Xóa list cũ trước khi add mới
+                    for (issue in snapshot.children) {
+                        val film = issue.getValue(Film::class.java)
+                        if (film != null) {
+                            topMoviesList.add(film)
+                        }
                     }
-                    if(items.isNotEmpty()){
-                        binding.rvTopMovies.layoutManager= LinearLayoutManager(
+                    if (topMoviesList.isNotEmpty()) {
+                        binding.rvTopMovies.layoutManager = LinearLayoutManager(
                             this@MainActivity,
                             LinearLayoutManager.HORIZONTAL,
-                            false)
-                        binding.rvTopMovies.adapter= FilmListAdapter(items)
+                            false
+                        )
+                        topMoviesAdapter = FilmListAdapter(topMoviesList)
+                        binding.rvTopMovies.adapter = topMoviesAdapter
                     }
-                    binding.pgBTopMovies.visibility= View.GONE //Ẩn ProgressBar khi load xong
+                    binding.pgBTopMovies.visibility = View.GONE
                 }
-
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
             }
-
         })
     }
 
     private fun initUpcomingMovies() {
-        val myRef: DatabaseReference =dataBase.getReference("Upcomming")
-        binding.pgBUpcomingMV.visibility= View.VISIBLE //Hiện ProgressBar khi đang load
-        val items= ArrayList<Film>()
+        val myRef: DatabaseReference = dataBase.getReference("Upcomming")
+        binding.pgBUpcomingMV.visibility = View.VISIBLE
+        val items = ArrayList<Film>()
         myRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                if(snapshot.exists()){
-                    for(issue in snapshot.children){
+                if (snapshot.exists()) {
+                    for (issue in snapshot.children) {
                         items.add(issue.getValue(Film::class.java)!!)
                     }
-                    if(items.isNotEmpty()){
-                        binding.rvUpcomingMV.layoutManager= LinearLayoutManager(
+                    if (items.isNotEmpty()) {
+                        binding.rvUpcomingMV.layoutManager = LinearLayoutManager(
                             this@MainActivity,
                             LinearLayoutManager.HORIZONTAL,
-                            false)
-                        binding.rvUpcomingMV.adapter= FilmListAdapter(items)
+                            false
+                        )
+                        binding.rvUpcomingMV.adapter = FilmListAdapter(items)
                     }
-                    binding.pgBUpcomingMV.visibility= View.GONE //Ẩn ProgressBar khi load xong
+                    binding.pgBUpcomingMV.visibility = View.GONE
                 }
-
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
             }
-
         })
     }
 
-
     private fun banners(lists: MutableList<Slideritems>) {
-        binding.viewPager2.adapter= SliderAdapter(lists, binding.viewPager2) //Kết nối dữ liệu với ViewPager2
-            binding.viewPager2.clipToPadding=false
-            binding.viewPager2.clipChildren=false
-            binding.viewPager2.offscreenPageLimit=3
-            binding.viewPager2.getChildAt(0).overScrollMode= RecyclerView.OVER_SCROLL_NEVER //Không có hiệu ứng “bật lại” khi kéo
+        binding.viewPager2.adapter = SliderAdapter(lists, binding.viewPager2)
+        binding.viewPager2.clipToPadding = false
+        binding.viewPager2.clipChildren = false
+        binding.viewPager2.offscreenPageLimit = 3
+        binding.viewPager2.getChildAt(0).overScrollMode = RecyclerView.OVER_SCROLL_NEVER
 
-        val compositePageTransformer= CompositePageTransformer().apply {
+        val compositePageTransformer = CompositePageTransformer().apply {
             addTransformer(MarginPageTransformer(40))
-            addTransformer(ViewPager2.PageTransformer{page, position ->
-                val r=1-Math.abs(position)
-                page.scaleY=0.85f + r * 0.15f // Slide ở giữa → to nhất, Slide bên → nhỏ hơn
+            addTransformer(ViewPager2.PageTransformer { page, position ->
+                val r = 1 - Math.abs(position)
+                page.scaleY = 0.85f + r * 0.15f
             })
         }
         binding.viewPager2.setPageTransformer(compositePageTransformer)
-        binding.viewPager2.currentItem=1 //Tránh lỗi trượt vô hạn (do nhân đôi list)
+        binding.viewPager2.currentItem = 1
         binding.viewPager2.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                sliderHandler.removeCallbacks(sliderRunnable)// Dừng auto slide để: Tránh giật, Tránh xung đột Handler
+                sliderHandler.removeCallbacks(sliderRunnable)
                 sliderHandler.postDelayed(sliderRunnable, 2000)
             }
         })
-
-
     }
-    //Dừng auto slide khi app nền
+
     override fun onPause() {
         super.onPause()
         sliderHandler.removeCallbacks(sliderRunnable)
     }
-    //Sau 2 giây → slider chạy lại
+
     override fun onResume() {
         super.onResume()
         sliderHandler.postDelayed(sliderRunnable, 2000)
     }
 }
-
-
-
-

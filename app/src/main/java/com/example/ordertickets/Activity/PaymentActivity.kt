@@ -5,10 +5,13 @@ import android.os.Bundle
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.ordertickets.Adapter.toVND
 import com.example.ordertickets.Models.Ticket
 import com.example.ordertickets.databinding.ActivityPaymentBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import java.text.NumberFormat
+import java.util.Locale
 
 class PaymentActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPaymentBinding
@@ -36,7 +39,9 @@ class PaymentActivity : AppCompatActivity() {
 
         binding.tvFilmTitle.text = filmTitle
         binding.tvSummary.text = "Ghế: $selectedSeats\nNgày: $date\nGiờ: $time"
-        binding.tvTotalPrice.text = "$$totalPrice"
+        val formatter = NumberFormat.getCurrencyInstance(Locale("vi", "VN"))
+        binding.tvTotalPrice.text = totalPrice.toVND()
+
     }
 
     private fun setVariables() {
