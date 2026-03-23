@@ -26,6 +26,7 @@ import android.text.Editable
 import com.example.ordertickets.R
 import android.content.Intent
 import android.widget.Button
+import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
 
 
@@ -58,6 +59,12 @@ class MainActivity : AppCompatActivity() {
         initUpcomingMovies()
         setupSearch()
         setupBottomNavigation()
+
+        val tvEmail = findViewById<TextView>(R.id.tvEmail)
+
+        val user = FirebaseAuth.getInstance().currentUser
+        tvEmail.text = user?.email ?: "Guest"
+
     }
 
     private fun setupBottomNavigation() {

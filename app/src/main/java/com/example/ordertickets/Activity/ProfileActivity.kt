@@ -8,12 +8,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ordertickets.Adapter.ProfileAdapter
 import com.example.ordertickets.R
+import com.google.firebase.auth.FirebaseAuth
 
 class ProfileActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
+
 
         val rvProfile = findViewById<RecyclerView>(R.id.rvProfile)
 
@@ -23,6 +25,7 @@ class ProfileActivity : AppCompatActivity() {
         val adapter = ProfileAdapter(menuItems) { selectedItem ->
             when (selectedItem) {
                 "Đăng xuất" -> {
+                    FirebaseAuth.getInstance().signOut()
                     val intent = Intent(this, MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
