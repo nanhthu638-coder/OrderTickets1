@@ -1,10 +1,15 @@
 package com.example.ordertickets.Activity
 
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.ViewGroup
 import android.view.ViewOutlineProvider
 import android.view.WindowManager
+import android.widget.Button
+import android.widget.EditText
+import android.widget.RatingBar
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -19,6 +24,9 @@ import com.example.ordertickets.Adapter.CategoryEachFilmAdapter
 import com.example.ordertickets.Models.Film
 import com.example.ordertickets.R
 import com.example.ordertickets.databinding.ActivityFilmDetailBinding
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import eightbitlab.com.blurview.RenderScriptBlur
 
 class FilmDetailActivity : AppCompatActivity() {
@@ -51,6 +59,13 @@ class FilmDetailActivity : AppCompatActivity() {
 
         binding.btnBack.setOnClickListener { finish() }
 
+        binding.imgVReview.setOnClickListener {
+
+            val videoId = item.Trailer
+
+            showReviewPopup(videoId.toString())
+        }
+
         binding.btnBuyTicket.setOnClickListener {
             val intent= Intent(this, SeatListActivity::class.java)
             intent.putExtra("film",item)
@@ -76,5 +91,40 @@ class FilmDetailActivity : AppCompatActivity() {
             binding.rvCastList.layoutManager= LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             binding.rvCastList.adapter= CastListAdapter(it)
         }
+    }
+
+    private fun showReviewPopup(videoId: String) {
+
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.dialog_review)
+
+        val playerView = dialog.findViewById<YouTubePlayerView>(R.id.videoView)
+
+        lifecycle.addObserver(playerView)
+
+        playerView.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+            override fun onReady(youTubePlayer: YouTubePlayer) {
+
+                youTubePlayer.loadVideo(videoId, 0f)
+
+            }
+        })
+
+        val ratingBar = dialog.findViewById<RatingBar>(R.id.ratingBar)
+        val reviewText = dialog.findViewById<EditText>(R.id.edtReview)
+        val btnSubmit = dialog.findViewById<Button>(R.id.btnSubmit)
+
+        btnSubmit.setOnClickListener {
+
+            val rating = ratingBar.rating
+            val review = reviewText.text.toString()
+
+            Toast.makeText(this,
+                "Rating: $rating\nReview: $review",
+                Toast.LENGTH_SHORT).show()
+
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 }
