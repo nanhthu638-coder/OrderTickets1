@@ -26,6 +26,7 @@ import android.text.Editable
 import com.example.ordertickets.R
 import android.content.Intent
 import android.widget.Button
+import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
 
 
@@ -35,7 +36,7 @@ class MainActivity : AppCompatActivity() {
     private val sliderHandler= Handler(Looper.getMainLooper()) //Dùng để hẹn giờ (timer) cho slider
     private val sliderRunnable = Runnable {binding.viewPager2.currentItem =
         (binding.viewPager2.currentItem + 1) % (binding.viewPager2.adapter?.itemCount ?: 1) } //Mỗi lần chạy → slider sang trang tiếp theo
-    private lateinit var topMoviesList: ArrayList<Film>
+    private var topMoviesList: ArrayList<Film> = ArrayList()
     private lateinit var topMoviesAdapter: FilmListAdapter
 
 
@@ -57,20 +58,36 @@ class MainActivity : AppCompatActivity() {
         initTopMoving()
         initUpcomingMovies()
         setupSearch()
+        setupBottomNavigation()
 
-        val btnProfile = findViewById<Button>(R.id.btnProfile)
-        btnProfile.setOnClickListener {
-            val currentUser = FirebaseAuth.getInstance().currentUser
-            if (currentUser == null) {
 
-                val intent = Intent(this, LoginActivity::class.java)
-                startActivity(intent)
-            } else{
-                val intent = Intent(this, ProfileActivity::class.java)
-                startActivity(intent)
+        val tvEmail = findViewById<TextView>(R.id.tvEmail)
+
+        val user = FirebaseAuth.getInstance().currentUser
+        tvEmail.text = user?.email ?: "Guest"
+
+    }
+
+    private fun setupBottomNavigation() {
+        // Mặc định chọn icon đầu tiên (Explorer)
+        binding.chipNavigationBar.setItemSelected(R.id.explorer, true)
+
+        binding.chipNavigationBar.setOnItemSelectedListener { id ->
+            when (id) {
+                R.id.profile -> {
+                    // Logic kiểm tra đăng nhập giống hệt nút Profile cũ của bạn
+                    val currentUser = FirebaseAuth.getInstance().currentUser
+                    if (currentUser == null) {
+                        startActivity(Intent(this, LoginActivity::class.java))
+                    } else {
+                        startActivity(Intent(this, ProfileActivity::class.java))
+                    }
+                }
+                R.id.explorer -> {
+                    // Có thể thêm logic quay về đầu trang hoặc load lại dữ liệu
+                }
+                // Bạn có thể thêm xử lý cho favorites hoặc cart tại đây
             }
-
-
         }
     }
     private fun setupSearch() {
@@ -78,16 +95,12 @@ class MainActivity : AppCompatActivity() {
         binding.editTextText.addTextChangedListener(object : TextWatcher {
 
             override fun afterTextChanged(s: Editable?) {
-
+                if (!::topMoviesAdapter.isInitialized || topMoviesList.isEmpty()) return
                 val keyword = s?.toString() ?: ""
-
-                val filteredList = topMoviesList.filter { film ->
-                    film.Title?.contains(keyword, ignoreCase = true) == true
-                }
-
+                val filteredList = topMoviesList.filter { film
+                    -> film.Title?.contains(keyword, ignoreCase = true) == true }
                 topMoviesAdapter.updateList(filteredList)
             }
-
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
@@ -115,8 +128,6 @@ class MainActivity : AppCompatActivity() {
                 binding.pgBSlider.visibility= View.GONE
                 banners(lists)
             }
-
-
             override fun onCancelled(error: DatabaseError) {
                 TODO("Not yet implemented")
             }
@@ -126,25 +137,31 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initTopMoving() {
-        val myRef: DatabaseReference =dataBase.getReference("Items")
-        binding.pgBTopMovies.visibility= View.VISIBLE //Hiện ProgressBar khi đang load
-        val items= ArrayList<Film>()
+        val myRef: DatabaseReference = dataBase.getReference("Items")
+        binding.pgBTopMovies.visibility = View.VISIBLE
+
+        topMoviesList = ArrayList() // GÁN vào biến global
+
         myRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                if(snapshot.exists()){
-                    for(issue in snapshot.children){
-                        items.add(issue.getValue(Film::class.java)!!)
+                if (snapshot.exists()) {
+                    for (issue in snapshot.children) {
+                        topMoviesList.add(issue.getValue(Film::class.java)!!)
                     }
-                    if(items.isNotEmpty()){
-                        binding.rvTopMovies.layoutManager= LinearLayoutManager(
+
+                    if (topMoviesList.isNotEmpty()) {
+                        binding.rvTopMovies.layoutManager = LinearLayoutManager(
                             this@MainActivity,
                             LinearLayoutManager.HORIZONTAL,
-                            false)
-                        binding.rvTopMovies.adapter= FilmListAdapter(items)
-                    }
-                    binding.pgBTopMovies.visibility= View.GONE //Ẩn ProgressBar khi load xong
-                }
+                            false
+                        )
 
+                        topMoviesAdapter = FilmListAdapter(topMoviesList) // GÁN adapter
+                        binding.rvTopMovies.adapter = topMoviesAdapter
+                    }
+
+                    binding.pgBTopMovies.visibility = View.GONE
+                }
             }
 
             override fun onCancelled(error: DatabaseError) {

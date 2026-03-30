@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.ordertickets.R
 import com.example.ordertickets.databinding.ItemTimeBinding
 
-class TimeAdapter(private val timeSlots: List<String>) :
+class TimeAdapter(private val timeSlots: List<String>, private val onTimeClick: (String) -> Unit) :
     RecyclerView.Adapter<TimeAdapter.TimeViewHolder>() {
     private var selectedPosition = -1
     private var lastSelectedPosition = -1
@@ -24,13 +24,18 @@ class TimeAdapter(private val timeSlots: List<String>) :
                 binding.tvTime.setBackgroundResource(R.drawable.light_black_bg)
                 binding.tvTime.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
             }
+
             binding.root.setOnClickListener {
-                val position=position
-                if(position!=RecyclerView.NO_POSITION){
-                    lastSelectedPosition=selectedPosition
-                    selectedPosition=position
+                val adapterPos = adapterPosition
+                if (adapterPos != RecyclerView.NO_POSITION) {
+                    lastSelectedPosition = selectedPosition
+                    selectedPosition = adapterPos
+
                     notifyItemChanged(lastSelectedPosition)
                     notifyItemChanged(selectedPosition)
+
+                    // 🔥 trả data về Activity
+                    onTimeClick(timeSlots[adapterPos])
                 }
             }
         }

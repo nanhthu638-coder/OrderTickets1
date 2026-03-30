@@ -9,7 +9,7 @@ import com.example.ordertickets.R
 import com.example.ordertickets.databinding.ItemDateBinding
 
 
-class DateAdapter(private val timeSlots: List<String>) :
+class DateAdapter(private val timeSlots: List<String>, private val onDateClick: (String) -> Unit) :
     RecyclerView.Adapter<DateAdapter.TimeViewHolder>() {
     private var selectedPosition = -1
     private var lastSelectedPosition = -1
@@ -32,13 +32,18 @@ class DateAdapter(private val timeSlots: List<String>) :
                     binding.tvDayTxt.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
                     binding.tvDateMonthTxt.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
                 }
+
                 binding.root.setOnClickListener {
-                    val position = position
-                    if (position != RecyclerView.NO_POSITION) {
+                    val adapterPos = adapterPosition
+                    if (adapterPos != RecyclerView.NO_POSITION) {
                         lastSelectedPosition = selectedPosition
-                        selectedPosition = position
+                        selectedPosition = adapterPos
+
                         notifyItemChanged(lastSelectedPosition)
                         notifyItemChanged(selectedPosition)
+
+                        // 🔥 gửi data ra ngoài
+                        onDateClick(timeSlots[adapterPos])
                     }
                 }
             }

@@ -1,15 +1,14 @@
 package com.example.ordertickets.Activity
 
-// Thư mục: com.example.ordertickets.Activity
-
-
 import android.content.Intent
 import android.os.Bundle
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.ordertickets.Adapter.ProfileAdapter // Import adapter của bạn
+import com.example.ordertickets.Adapter.ProfileAdapter
 import com.example.ordertickets.R
+import com.google.firebase.auth.FirebaseAuth
 
 class ProfileActivity : AppCompatActivity() {
 
@@ -17,24 +16,32 @@ class ProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
+
         val rvProfile = findViewById<RecyclerView>(R.id.rvProfile)
 
-        // 1. Tạo danh sách các mục hiển thị
-        val menuItems = listOf("Thông tin tài khoản", "Lịch sử đặt vé", "Cài đặt", "Đăng xuất")
+        val menuItems =
+            listOf("Thông tin tài khoản", "Lịch sử đặt vé", "Cài đặt", "Đăng xuất", "Vé của tôi")
 
-        // 2. Thiết lập Adapter
         val adapter = ProfileAdapter(menuItems) { selectedItem ->
-            if (selectedItem == "Đăng xuất") {
-                // Logic Đăng xuất: Quay về màn hình Login và xóa lịch sử chuyển trang
-                val intent = Intent(this, LoginActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
+            when (selectedItem) {
+                "Đăng xuất" -> {
+                    FirebaseAuth.getInstance().signOut()
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                }
+                "Vé của tôi" -> {
+                    val intent = Intent(this, MyTicketsActivity::class.java)
+                    startActivity(intent)
+                }
             }
-            // Bạn có thể thêm các mục khác như "Lịch sử đặt vé" ở đây
         }
 
-        // 3. Kết nối RecyclerView với Adapter
         rvProfile.layoutManager = LinearLayoutManager(this)
         rvProfile.adapter = adapter
+        
+        findViewById<ImageView>(R.id.imgBackProfile).setOnClickListener {
+            finish()
+        }
     }
 }

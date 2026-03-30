@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Cinema Tickets Booking</string>
     <string name="app_description">Thế giới điện ảnh giờ đây gói gọn ngay trong chiếc điện thoại của bạn. Từ những bom tấn Hollywood mới nhất đến các bộ phim độc lập đầy nghệ thuật, chúng tôi mang đến cho bạn giải pháp đặt vé nhanh chóng, tiện lợi và thông minh nhất.</string>
@@ -15,6 +16,6 @@
     <string name="Available_seat">Available</string>
     <string name="Selected">Selected</string>
     <string name="Unavailable_seat">Unavailable</string>
-    <string name="Download_Ticket">Download Ticket</string>
+    <string name="Download_Ticket">Thanh Toán</string>
 
 </resources>

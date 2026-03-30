@@ -73,6 +73,16 @@
                             android:textColor="@color/white"
                             android:textSize="30sp"
                             android:textStyle="bold" />
+                        <ImageView
+                            android:id="@+id/imgVReview"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginEnd="16dp"
+                            app:srcCompat="@drawable/trailer"
+                            android:clickable="true"
+                            android:focusable="false"
+                            />
 
                         <ImageView
                             android:id="@+id/imgVShare"
