@@ -40,9 +40,7 @@
         <activity
             android:name=".Activity.ProfileActivity"
             android:exported="false"/>
-        <activity
-            android:name=".Activity.PaymentActivity"
-            android:exported="false"/>
+        
         <activity
             android:name=".Activity.MyTicketsActivity"
             android:exported="false"/>

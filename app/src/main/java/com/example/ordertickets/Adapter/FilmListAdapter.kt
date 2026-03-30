@@ -28,7 +28,7 @@ class FilmListAdapter(private var items:ArrayList<Film>):
                 .apply(requestOptions)
                 .into(binding.imgVPic)
             binding.root.setOnClickListener {
-             val intent= Intent(context, FilmDetailActivity::class.java)
+             val intent = Intent(context, FilmDetailActivity::class.java)
                 intent.putExtra("object", film)
                 context!!.startActivity(intent)
             }
