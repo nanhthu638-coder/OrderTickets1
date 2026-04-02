@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Quản lý Phim</title>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <style>
+    body { font-family: Arial; background:#f0f0f0; }
+    .box { background:white; padding:20px; margin:20px; border-radius:10px; }
+    input, button { padding:8px; margin:5px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+    td, th { padding: 10px; border: 1px solid #ddd; text-align: center; }
+    img { border-radius: 8px; }
+    button { padding: 6px 12px; cursor: pointer; }
+    h2 { margin-top: 30px; }
+  </style>
+</head>
+
+<body>
+
+<h1>🎬 ADMIN QUẢN LÝ APP ĐẶT VÉ</h1>
+
+<div class="box">
+<h2>➕ Thêm Banner</h2>
+<input id="bannerImg" placeholder="Nhập link ảnh banner">
+<button onclick="addBanner()">Thêm Banner</button>
+</div>
+
+<div class="box">
+<h2>🎬 Thêm Phim (Top Movies)</h2>
+<input id="filmName" placeholder="Tên phim">
+<input id="filmImg" placeholder="Link ảnh phim">
+<button onclick="addFilm()">Thêm Phim</button>
+</div>
+
+<div class="box">
+<h2>📋 Danh sách Banner</h2>
+<table>
+  <thead>
+    <tr><th>Ảnh</th><th>Xóa</th></tr>
+  </thead>
+  <tbody id="bannerTable"></tbody>
+</table>
+</div>
+
+<div class="box">
+<h2>📋 Top Movies</h2>
+<table>
+  <thead>
+    <tr><th>Tên</th><th>Ảnh</th><th>Xóa</th></tr>
+  </thead>
+  <tbody id="filmTable"></tbody>
+</table>
+</div>
+
+<div class="box"> 
+<h2>📋 Upcoming Movies</h2> 
+<table>
+  <thead>
+    <tr><th>Tên</th><th>Ảnh</th><th>Xóa</th></tr>
+  </thead>
+  <tbody id="upcomingTable"></tbody>
+</table> 
+</div>
+
+<script>
+// ===== DÁN CONFIG FIREBASE CỦA BẠN VÀO ĐÂY =====
+const firebaseConfig = {
+  apiKey: "AIzaSyDVOEYHgUVbtzZ2Lpjew4fcBMY0OqMoZMU",
+  authDomain: "ordertickets-9c094.firebaseapp.com",
+  databaseURL: "https://ordertickets-9c094-default-rtdb.firebaseio.com",
+  projectId: "ordertickets-9c094",
+  storageBucket: "ordertickets-9c094.firebasestorage.app",
+  messagingSenderId: "128536044997",
+  appId: "1:128536044997:web:60f653bf19af043c2597ac"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ===== THÊM BANNER =====
+function addBanner(){
+  const img = document.getElementById("bannerImg").value;
+  const id = firebase.database().ref().child("Banners").push().key;
+
+  firebase.database().ref("Banners/" + id).set({
+    image: img
+  });
+
+  alert("Đã thêm banner!");
+}
+
+// ===== THÊM PHIM =====
+function addFilm(){
+  const name = document.getElementById("filmName").value;
+  const img = document.getElementById("filmImg").value;
+  const id = firebase.database().ref().child("Items").push().key;
+
+  firebase.database().ref("Items/" + id).set({
+    title: name,
+    image: img
+  });
+
+  alert("Đã thêm phim!");
+}
+
+// ===== RETRY =====
+function loadImageWithRetry(url, elementId, retry = 6) {
+  const img = new Image();
+  img.src = url + "&t=" + new Date().getTime();
+
+  img.onload = () => {
+    document.getElementById(elementId).src = img.src;
+  };
+
+  img.onerror = () => {
+    if (retry > 0) {
+      console.log("Retry:", elementId, "còn", retry);
+      setTimeout(() => {
+        loadImageWithRetry(url, elementId, retry - 1);
+      }, 1000);
+    } else {
+      document.getElementById(elementId).src = "https://via.placeholder.com/250";
+    }
+  };
+}
+
+
+// ===== HIỂN THỊ BANNER =====
+firebase.database().ref("Banners").on("child_added", snapshot => {
+  const table = document.getElementById("bannerTable");
+
+  const id = snapshot.key;
+  const data = snapshot.val();
+
+  const tr = document.createElement("tr");
+  tr.id = id;
+
+  tr.innerHTML = `
+    <td>
+      <img id="img-${id}" src="https://via.placeholder.com/200" width="200">
+    </td>
+    <td>
+      <button onclick="deleteBanner('${id}')">Xóa</button>
+    </td>
+  `;
+
+  table.appendChild(tr);
+
+  // 🚀 gọi retry
+  loadImageWithRetry(data.image, `img-${id}`);
+});
+
+firebase.database().ref("Banners").on("child_removed", snapshot => {
+  const id = snapshot.key;
+  document.getElementById(id)?.remove();
+});
+
+
+// ===== HIỂN THỊ TopMV =====
+firebase.database().ref("Items").on("child_added", snapshot => {
+  const table = document.getElementById("filmTable");
+
+  const id = snapshot.key;
+  const data = snapshot.val();
+
+  const tr = document.createElement("tr");
+  tr.id = "Items-" + id;
+
+  tr.innerHTML = `
+    <td>${data.Title}</td>
+    <td>
+      <img id="Poster-Items-${id}" src="https://via.placeholder.com/150" width="150">
+    </td>
+    <td>
+      <button onclick="deleteFilm('${id}')">Xóa</button>
+    </td>
+  `;
+
+  table.appendChild(tr);
+
+  // 🚀 gọi retry
+  loadImageWithRetry(data.Poster, `Poster-Items-${id}`);
+});
+
+firebase.database().ref("Items").on("child_removed", snapshot => {
+  const id = snapshot.key;
+  document.getElementById("Items-" + id)?.remove();
+});
+
+// ===== HIỂN THỊ UpcomingMV =====
+firebase.database().ref("Upcomming").on("child_added", snapshot => {
+  const table = document.getElementById("upcomingTable");
+
+  const id = snapshot.key;
+  const data = snapshot.val();
+
+  const tr = document.createElement("tr");
+  tr.id = "Upcomming-" + id;
+
+  tr.innerHTML = `
+    <td>${data.Title}</td>
+    <td>
+      <img id="Poster-Upcomming-${id}" src="https://via.placeholder.com/150" width="150">
+    </td>
+    <td>
+      <button onclick="deleteFilm('${id}')">Xóa</button>
+    </td>
+  `;
+
+  table.appendChild(tr);
+
+  // 🚀 gọi retry
+  loadImageWithRetry(data.Poster, `Poster-Upcomming-${id}`);
+});
+
+firebase.database().ref("Upcomming").on("child_removed", snapshot => {
+  const id = snapshot.key;
+  document.getElementById("Upcomming-" + id)?.remove();
+});
+
+
+// ===== XÓA DỮ LIỆU =====
+function deleteBanner(id){
+  firebase.database().ref("Banners/" + id).remove();
+}
+
+function deleteFilm(id){
+  firebase.database().ref("Items/" + id).remove();
+}
+</script>
+
+</body>
+</html>
