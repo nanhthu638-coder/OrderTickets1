@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#121212"
-    android:padding="20dp">
+    android:padding="20dp"
+    android:gravity="center_vertical">
 
     <LinearLayout
         android:id="@+id/layoutAuth"
@@ -22,33 +22,54 @@
             android:textColor="#FFFFFF"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:layout_marginBottom="20dp"/>
-
+            android:layout_marginBottom="32dp"/>
 
         <EditText
             android:id="@+id/edtEmail"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="55dp"
             android:hint="Email"
             android:textColor="#FFFFFF"
-            android:textColorHint="#888"
-            android:background="@android:drawable/editbox_background_normal"/>
+            android:textColorHint="#888888"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/light_black_bg"/>
+
         <EditText
             android:id="@+id/edtPassword"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="55dp"
             android:hint="Mật khẩu"
             android:inputType="textPassword"
             android:textColor="#FFFFFF"
-            android:textColorHint="#888"
-            android:background="@android:drawable/editbox_background_normal"/>
-        <Button
+            android:textColorHint="#888888"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/light_black_bg"/>
+
+        <!-- Thêm ô Nhập lại mật khẩu (Mặc định ẩn, chỉ hiện khi Đăng ký) -->
+        <EditText
+            android:id="@+id/edtConfirmPassword"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:hint="Nhập lại mật khẩu"
+            android:inputType="textPassword"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#888888"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"
+            android:visibility="gone"
+            android:background="@drawable/light_black_bg"/>
+
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnSubmit"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="55dp"
             android:text="ĐĂNG NHẬP"
-            android:backgroundTint="#FF5722"
-            android:layout_marginTop="10dp"/>
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:background="@drawable/orange_button"
+            android:layout_marginTop="16dp"/>
 
         <TextView
             android:id="@+id/txtSwitch"
@@ -56,13 +77,8 @@
             android:layout_height="wrap_content"
             android:text="Chưa có tài khoản? Đăng ký"
             android:textColor="#FF5722"
-            android:layout_marginTop="15dp"/>
+            android:padding="8dp"
+            android:layout_marginTop="20dp"/>
     </LinearLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvProfile"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
 
 </LinearLayout>

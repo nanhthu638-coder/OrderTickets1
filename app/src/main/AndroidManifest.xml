@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.OrderTickets">
         <activity
+            android:name=".Activity.PaymentActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activity.SeatListActivity"
             android:exported="false" />
         <activity
@@ -36,6 +39,13 @@
         <activity
             android:name=".Activity.ProfileActivity"
             android:exported="false"/>
+        <activity
+            android:name=".Activity.PaymentActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".Activity.MyTicketsActivity"
+            android:exported="false"/>
+
     </application>
 
 </manifest>
