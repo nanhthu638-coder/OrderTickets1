@@ -60,4 +60,5 @@ dependencies {
     implementation("com.github.Dimezis:BlurView:version-2.0.3")
     implementation(platform ("com.google.firebase:firebase-bom:32.1.1"))
     implementation( "com.google.firebase:firebase-auth-ktx")
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 }

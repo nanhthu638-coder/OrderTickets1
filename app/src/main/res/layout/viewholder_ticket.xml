@@ -43,27 +43,40 @@
                 android:layout_weight="1"
                 android:text="20/10/2023 - 10:00 AM"
                 android:textColor="@color/grey" />
-
             <TextView
                 android:id="@+id/tvTicketPrice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0.0 VND"
                 android:textColor="@color/orange_bg"
-                android:textStyle="bold" />
-
+                android:textStyle="bold"
+                android:layout_marginEnd="-140dp"
+                />
+            <TextView
+                android:id="@+id/tvDownTicket"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="Tải vé"
+                android:textColor="@android:color/holo_green_dark"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="50dp"/>
+            <TextView
+                android:id="@+id/tvCancelTicket"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_marginTop="24dp"
+                android:text="Huỷ vé"
+                android:textColor="@android:color/holo_red_dark"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:gravity="end" />
         </LinearLayout>
-        <TextView
-            android:id="@+id/tvCancelTicket"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Huỷ vé"
-            android:textSize="16sp"
-            android:textColor="@android:color/holo_red_dark"
-            android:textStyle="bold"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="right"
-            android:layout_marginTop="16dp"/>
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>
